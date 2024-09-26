@@ -27,6 +27,12 @@ class SendUserUpdatesToAPI extends Command
      */
     public function handle()
     {
+        // 50 req / 60 min => 1,2 min.
+        // 60 / 1.2 = 50 * 1000 = 50000
+
+        // Add a delay of 12 seconds (0.2 minutes)
+        sleep(12);
+
         $userUpdateRepository = app(UserUpdateRepository::class);
         $updates = $userUpdateRepository->getBatch(limit: 1000);
 

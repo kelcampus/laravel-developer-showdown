@@ -3,4 +3,5 @@
 use App\Console\Commands\SendUserUpdatesToAPI;
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command(SendUserUpdatesToAPI::class)->everyTwoMinutes();
+// 50 / 60 = 1.2
+Schedule::command(SendUserUpdatesToAPI::class)->everyMinute();
