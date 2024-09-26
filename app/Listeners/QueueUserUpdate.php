@@ -3,19 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\UserUpdated;
-use App\Models\UserUpdate;
 use App\Repositories\UserUpdateRepository;
 
-// use Illuminate\Contracts\Queue\ShouldQueue;
-// use Illuminate\Queue\InteractsWithQueue;
-
-class QueueUserUpdate // implements ShouldQueue
+class QueueUserUpdate
 {
-    // use InteractsWithQueue;
-
-    /**
-     * Handle the event.
-     */
     public function handle(UserUpdated $event): void
     {
         $userUpdateRepository = app(UserUpdateRepository::class);

@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use App\Repositories\UserUpdateRepository;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class SendUserUpdatesToAPI extends Command
 {
@@ -35,23 +35,16 @@ class SendUserUpdatesToAPI extends Command
             return;
         }
 
-        // Prepare the payload for the API
         $payload = $this->mountDataPayload($updates);
 
-        // Send the API request
-        $response = Http::get(route('fake_api_batch'), $payload);
+        $status = $this->sendBatchUserUpdatesToProvider($payload);
 
-        if ($response->successful()) {
-            // Delete the processed records from the database
-            dd('deu certo'); // parei aqui
-
+        if ($status) {
             $userUpdateRepository->deleteUpdates($updates);
             $this->info('Successfully sent user updates to the API.');
-
             return 0;
         }
 
-        $this->error('Failed to send user updates to the API. Response: ' . $response->body());
         return 1;
     }
 
@@ -62,11 +55,37 @@ class SendUserUpdatesToAPI extends Command
                 'subscribers' => $updates->map(function ($update) {
                     return [
                         'email' => $update->email,
-                        'name' => $update->firstname . ' ' . $update->lastname,
+                        'fullname' => $update->firstname . ' ' . $update->lastname,
                         'time_zone' => $update->time_zone,
                     ];
                 })->toArray(),
             ]],
         ];
+    }
+
+    public function sendBatchUserUpdatesToProvider($payload): bool
+    {
+        try {
+            foreach ($payload['batches'] as $batch) {
+                foreach ($batch['subscribers'] as $subscriber) {
+                    $this->saveLog($subscriber);
+                }
+            }
+        } catch (\Throwable $th) {
+            $this->error('Failed to send user updates to the API. Response: ' . $th->getMessage());
+            return false;
+        }
+
+        return true;
+    }
+
+    private function saveLog(array $subscriber): void
+    {
+        Log::info(sprintf(
+            "[%s] fullname: %s, timezone: '%s'",
+            $subscriber['email'],
+            $subscriber['fullname'],
+            $subscriber['time_zone']
+        ));
     }
 }

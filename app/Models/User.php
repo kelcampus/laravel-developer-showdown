@@ -42,9 +42,9 @@ class User extends Authenticatable
      * @var array<string, string>
      */
     protected $dispatchesEvents = [
+        'created' => UserUpdated::class,
         'updated' => UserUpdated::class,
-        // 'saved' => UserSaved::class,
-        // 'deleted' => UserDeleted::class,
+        'saved' => UserUpdated::class,
     ];
 
     /**

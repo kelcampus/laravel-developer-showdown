@@ -28,20 +28,12 @@ class UserUpdateRepository
         return $this->model::where('id', '=', $userUpdate->id)->update($data);
     }
 
-    public function deleteUpdates($userUpdates)
+    public function deleteUpdates($userUpdates): void
     {
         foreach ($userUpdates as $userUpdate) {
-            dd($userUpdate);
-            return $this->model::destroy($userUpdate->id);
+            $this->model::destroy($userUpdate->id);
         }
-
-        dd('aqui');
-
-        // UserUpdate::whereIn('email', $updates->pluck('email'))->delete();
-        // return $this->model::where('email', '=', $email)->first();
     }
-
-
 }
 
 
